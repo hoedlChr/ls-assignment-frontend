@@ -1,29 +1,32 @@
 import {Box, Button, Card, CardContent, Checkbox, Stack, Typography} from "@mui/material";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import React, {useState} from "react";
 
 export function Kanban() {
-    const onDragEnd = (result: any) => {
-        items[parseInt(result.destination.droppableId)].splice(result.destination.index, 0, items[parseInt(result.source.droppableId)].splice(result.source.index, 1)[0]);
-        items[parseInt(result.source.droppableId)].splice(result.source.index, 1);
-    };
-    let items = [
+    const [items, setItems] = useState([
         [
-            {id: "11", content: <KanbanItem name="11"/>},
-            {id: "12", content: <KanbanItem name="12"/>},
-            {id: "13", content: <KanbanItem name="13"/>},
+            {id: 11, content: <KanbanItem name="11"/>},
+            {id: 12, content: <KanbanItem name="12"/>},
+            {id: 13, content: <KanbanItem name="13"/>},
         ],
         [
-            {id: "21", content: <KanbanItem name="21"/>},
-            {id: "22", content: <KanbanItem name="22"/>},
-            {id: "23", content: <KanbanItem name="23"/>},
+            {id: 21, content: <KanbanItem name="21"/>},
+            {id: 22, content: <KanbanItem name="22"/>},
+            {id: 23, content: <KanbanItem name="23"/>},
         ],
         [
-            {id: "31", content: <KanbanItem name="31"/>},
-            {id: "32", content: <KanbanItem name="32"/>},
-            {id: "33", content: <KanbanItem name="33"/>},
+            {id: 31, content: <KanbanItem name="31"/>},
+            {id: 32, content: <KanbanItem name="32"/>},
+            {id: 33, content: <KanbanItem name="33"/>},
         ],
 
-    ]
+    ])
+    const onDragEnd = (result: any) => {
+        let itemsCopy = items;
+        itemsCopy[parseInt(result.destination.droppableId)].
+        splice(result.destination.index, 0, items[parseInt(result.source.droppableId)].splice(result.source.index, 1)[0]);
+        setItems([...itemsCopy]);
+    };
     return (
         <Box sx={{paddingBottom: 4}}>
             <DragDropContext onDragEnd={onDragEnd}>
@@ -48,6 +51,16 @@ export function Kanban() {
                                         </Draggable>
                                     ))
                                 }
+
+                    <Button onClick={()=>{
+                        let itemsCopy = [...items];
+                        let allIds :number[] = itemsCopy.flat().map((item)=>item.id);
+                        let highestId :number= allIds.reduce((prev, current) => (prev > current) ? prev : current);
+                        highestId++;
+                        
+                        itemsCopy[listIndex].push({id: highestId, content: <KanbanItem name={highestId.toString()}/>}); 
+                        setItems(itemsCopy)
+                        }}>Add item</Button>
                                 </KanbanList>
                         {provided.placeholder}
                         </div>
@@ -79,7 +92,6 @@ function KanbanList({children}: { children: React.ReactNode }) {
             <CardContent>
                 <Stack spacing={2}>
                     {children}
-                    {/* <Button>Add item</Button> */}
                 </Stack>
             </CardContent>
         </Card>
